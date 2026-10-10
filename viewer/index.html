@@ -117,6 +117,7 @@ aside[hidden]{display:none!important}
     <button class="ib" id="spin" aria-pressed="true">자동 회전</button>
     <button class="ib" id="reset" title="회전·확대·이동과 고른 카테고리를 처음 상태로">시점 초기화</button>
     <button class="ib" id="gbtn" aria-pressed="false">운영지침</button>
+    <a class="ib" id="board" href="https://claude.ai/artifact/MScP7qucZ5BETL4W17jVXZ" target="_blank" rel="noopener" style="text-decoration:none">새벽 작성 현황판 ↗</a>
     <div class="row"><span class="lab">블로그</span><div class="chips" id="chips"></div>
       <span class="lab">주제</span><div class="chips" id="tchips"></div></div>
   </header>
@@ -223,10 +224,11 @@ const winLabel = () => mode==="all" ? `${(rF||rT<NDAYS-1)?"기간":"전체"} ${f
 
 /* ---------- UI ---------- */
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+const pbtn={};
 PK.forEach(k=>{ if(!BALL[k]) return; const b=document.createElement("button"); b.className="chip"; b.setAttribute("aria-pressed","true");
   b.innerHTML=`<i style="background:var(${PLAT[k].css})"></i>${PLAT[k].name} ${BALL[k].N}`;
   b.onclick=()=>{ on[k]=!on[k]; b.setAttribute("aria-pressed",on[k]); if(sel&&!on[sel.platform]) closeDetail(); if(catFocus&&!on[catFocus.pk]) catFocus=null; ui(); };
-  $("chips").appendChild(b); });
+  pbtn[k]=b; $("chips").appendChild(b); });
 const tbtn = [];
 TOPICS.forEach((n,i)=>{ const cnt=P.filter(p=>p.ti===i).length; if(!cnt) return;
   const b=document.createElement("button"); b.className="chip"; b.setAttribute("aria-pressed","true");
@@ -305,15 +307,14 @@ function openDetail(p){
   pivT = world(p).slice();
 }
 $("gbtn").onclick=()=>{ const g=$("guide"); if(!g.hidden){closeGuide();return;} closeDetail();
-  g.innerHTML=`<button class="ib close" id="gx" aria-label="닫기">✕</button><div class="body"><h3>운영지침 요약</h3><dl>
-  <div><dt>매일 구성</dt><dd>워드프레스 새벽 3편(부업 리뷰, 간밤 금융, 건강·의료)과 낮에 주제를 받는 요청 1칸. 티스토리 3편(게임 인사이트, 대중심리·의사결정, 콘텐츠·문화), 네이버 2편(생활 경제·건강, 생활 제도·소비). 평일 15:35에 한국 증시 마감 글이 따로 나갑니다.</dd></div>
-  <div><dt>글의 모양</dt><dd>장면으로 시작하되 세 문장 안에 한 줄 결론. 문장 끝은 한 가지로 이어 쓰지 않고 섞어 씁니다.</dd></div>
-  <div><dt>금융·주식 글</dt><dd>오른 이유를 인과 사슬로 쓰고, 비슷한 과거 사례와 확인 기준, 판단이 갈리는 관찰 조건으로 마무리합니다. 간밤 금융은 그날 가장 큰 시장 뉴스를 먼저 고릅니다.</dd></div>
-  <div><dt>게임 글</dt><dd>게임 소개가 아니라 설계 하나에서 꺼낸 현실·심리·아이디어 인사이트.</dd></div>
-  <div><dt>제목</dt><dd>사람들이 실제로 검색하는 말을 맨 앞에, 날짜는 뒤로. 30~40자, 핵심어는 앞 20자 안.</dd></div>
-  <div><dt>이미지</dt><dd>금융은 시네마틱 초현실, 부업은 지점토 3D, 생활정보는 색종이 디오라마, 건강은 마그리트풍, 대중심리는 미니멀 포스터. 티스토리·네이버는 글마다 두 번만 그려 격자 한 장을 네 컷으로 자릅니다.</dd></div>
-  <div><dt>발행</dt><dd>워드프레스는 비공개 저장 후 글자 검수를 거쳐 공개. 티스토리·네이버는 원고와 이미지 세트까지만 준비하고 직접 올립니다.</dd></div>
-  <div><dt>이 지도</dt><dd>워드프레스 글 목록과 티스토리 사이트맵을 읽어, 새 글이 올라오면 자동으로 다시 만듭니다. 네이버는 준비한 글 세트 기준입니다.</dd></div></dl></div>`;
+  g.innerHTML=`<button class="ib close" id="gx" aria-label="닫기">✕</button><div class="body"><h3>운영지침 요약 (10/10 기준)</h3><dl>
+  <div><dt>매일 구성</dt><dd>워드프레스 3편: 부업 ↔ 정규 일자리(부업 날은 AI 활용과 번갈아), 밤사 미국 시황+종목, 금융 용어·제도 해설. 평일 15:35 한국 증시 마감 글. 티스토리 3편: 게임 인사이트, 콘텐츠·문화 탐구('시작' 찾기), 생활 법률 탐구. 네이버 3편: 일·돈, 삶·돌봄, AI 활용.</dd></div>
+  <div><dt>글의 모양</dt><dd>세 문장 안에 한 줄 결론. 워드프레스는 처음 접하는 사람 기준으로 용어를 풀고 길게 써도 됨. 맨 위 '한눈에 보기'는 전문용어로 본문을 궁금하게. 네이버는 '계기 → 알아봤다 → 결론 먼저'.</dd></div>
+  <div><dt>금융·주식 글</dt><dd>오르내린 이유를 인과 사슬로, 과거 사례와 확인 기준, 판단이 갈리는 관찰 조건. 추천·목표가 없음.</dd></div>
+  <div><dt>게임 글</dt><dd>게임 소개가 아니라 설계 하나에서 꺼낸 현실·심리 인사이트. 옛 게임도 적극.</dd></div>
+  <div><dt>이미지</dt><dd>금융은 상징 중심 사실주의, 부업은 따뜻한 사실주의, 콘텐츠는 팝아트, 생활 법률은 색종이 디오라마, 네이버는 지점토 3D. 손가락·소품이 이상한 그림은 다시 그림.</dd></div>
+  <div><dt>발행</dt><dd>워드프레스는 비공개 저장 후 검수를 거쳐 공개(출처 목록 없음). 티스토리·네이버는 원고와 이미지까지만 준비하고 직접 올립니다.</dd></div>
+  <div><dt>자세히</dt><dd>주제 찾는 법, 금지 사항, 이미지 프롬프트, 실행 순서는 <a href="https://claude.ai/artifact/MScP7qucZ5BETL4W17jVXZ" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">새벽 작성 현황판 ↗</a>에서 탭으로 봅니다.</dd></div></dl></div>`;
   g.hidden=false; $("gbtn").setAttribute("aria-pressed","true"); $("gx").onclick=closeGuide; };
 
 /* ---------- 3D ---------- */
@@ -494,6 +495,13 @@ cv.addEventListener("wheel",e=>{ e.preventDefault(); zoom=Math.max(0.4,Math.min(
 cv.addEventListener("dblclick",e=>{ const r=cv.getBoundingClientRect(); if(!pick(e.clientX-r.left,e.clientY-r.top)) resetView(); });
 cv.addEventListener("contextmenu",e=>e.preventDefault());
 
+/* 주소 끝 #wordpress, #naver.topic-2 처럼 블로그·주제를 골라 연다(현황판에서 넘어올 때) */
+(function(){ const h=(location.hash||"").slice(1).toLowerCase(); if(!h) return;
+  const parts=h.split("."); const pk=parts.find(x=>PLAT[x]); const tp=parts.find(x=>/^topic-\d+$/.test(x));
+  if(pk&&BALL[pk]) PK.forEach(k=>{ on[k]=(k===pk); if(pbtn[k]) pbtn[k].setAttribute("aria-pressed",on[k]); });
+  if(tp){ const ti=+tp.slice(6); if(ti>=0&&ti<TOPICS.length&&P.some(p=>p.ti===ti&&(!pk||p.platform===pk)))
+    TOPICS.forEach((_,i)=>{ onT[i]=(i===ti); if(tbtn[i]) tbtn[i].setAttribute("aria-pressed",onT[i]); }); }
+})();
 ui();
 requestAnimationFrame(tick);
 </script>
